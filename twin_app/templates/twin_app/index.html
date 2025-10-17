@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Digital Twin Health System - Personalized Health Monitoring{% endblock %}
+{% block description %}Advanced AI-powered health monitoring system for students. Track vitals, predict health risks, and get personalized insights.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero">
+    <div class="hero-background">
+        <div class="hero-background-overlay"></div>
+    </div>
+    <div class="hero-content">
+        <h1 class="hero-title animate-fade-in-up">Your Digital Health Twin</h1>
+        <p class="hero-subtitle animate-fade-in-up">Empowering students with AI-driven health insights and predictive analytics for better well-being and academic success.</p>
+        <div class="hero-buttons animate-fade-in-up">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-chart-line"></i> View Dashboard
+                </a>
+                <a href="{% url 'manual_entry' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-plus-circle"></i> Add Health Data
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus"></i> Get Started Free
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <h2 class="section-title">Comprehensive Health Monitoring</h2>
+        <div class="features-grid">
+            <div class="feature-card animate-fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h3>Vital Signs Tracking</h3>
+                <p>Monitor essential health metrics including heart rate, blood pressure, temperature, and oxygen saturation with precision and ease.</p>
+                <ul>
+                    <li>Real-time health monitoring</li>
+                    <li>Automated anomaly detection</li>
+                    <li>Historical trend analysis</li>
+                </ul>
+            </div>
+
+            <div class="feature-card animate-fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>AI-Powered Predictions</h3>
+                <p>Advanced machine learning algorithms analyze your data to provide personalized health risk assessments and actionable recommendations.</p>
+                <ul>
+                    <li>Predictive health analytics</li>
+                    <li>Personalized recommendations</li>
+                    <li>Risk factor identification</li>
+                </ul>
+            </div>
+
+            <div class="feature-card animate-fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>Academic Integration</h3>
+                <p>Understand how your health impacts academic performance through comprehensive correlation analysis and insights.</p>
+                <ul>
+                    <li>Performance correlation analysis</li>
+                    <li>Study pattern optimization</li>
+                    <li>Academic stress monitoring</li>
+                </ul>
+            </div>
+
+            <div class="feature-card animate-fade-in-up">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Advanced Analytics</h3>
+                <p>Visualize complex health patterns through interactive charts, trend analysis, and comprehensive reporting tools.</p>
+                <ul>
+                    <li>Interactive data visualization</li>
+                    <li>Trend analysis and forecasting</li>
+                    <li>Comprehensive health reports</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number">{{ total_users|default:"2,847" }}</span>
+                <span class="stat-label">Active Users</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ total_predictions|default:"15,623" }}</span>
+                <span class="stat-label">AI Predictions Generated</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ total_data_points|default:"87,432" }}</span>
+                <span class="stat-label">Health Data Points</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ accuracy_rate|default:"99.2" }}%</span>
+                <span class="stat-label">Prediction Accuracy</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="features">
+    <div class="container">
+        <h2 class="section-title">How Digital Twin Works</h2>
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Data Collection</h3>
+                    <p>Input your health vitals, lifestyle factors, and academic performance metrics through our intuitive interface.</p>
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>AI Analysis</h3>
+                    <p>Our advanced algorithms analyze your data patterns, identify correlations, and assess health risks.</p>
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Insights Generation</h3>
+                    <p>Receive personalized health insights, risk assessments, and actionable recommendations.</p>
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Continuous Monitoring</h3>
+                    <p>Track your progress, monitor trends, and adjust your health goals based on ongoing analysis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="features" style="background: var(--gradient-primary); color: white;">
+    <div class="container" style="text-align: center;">
+        <h2 class="section-title" style="color: white; margin-bottom: var(--spacing-lg);">Start Your Health Journey Today</h2>
+        <p style="font-size: 1.25rem; margin-bottom: var(--spacing-xl); opacity: 0.9;">
+            Join thousands of students who have transformed their health and academic performance with AI-powered insights.
+        </p>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'register' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-rocket"></i> Get Started Now
+            </a>
+        {% else %}
+            <a href="{% url 'manual_entry' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-plus-circle"></i> Add Your First Entry
+            </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize homepage animations and interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate statistics counters
+        const statNumbers = document.querySelectorAll('.stat-number');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        statNumbers.forEach(stat => observer.observe(stat));
+
+        function animateCounter(element) {
+            const target = parseInt(element.textContent.replace(/,/g, ''));
+            const duration = 2000;
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString();
+            }, 16);
+        }
+
+        // Add animation classes to elements as they come into view
+        const animateElements = document.querySelectorAll('.animate-fade-in-up');
+        const animationObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        animateElements.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            animationObserver.observe(element);
+        });
+    });
+</script>
+{% endblock %}

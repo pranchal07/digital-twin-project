@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Data Entry - Digital Twin{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="container">
+        <div class="form-header">
+            <h1><i class="fas fa-plus-circle"></i> Manual Health Data Entry</h1>
+            <p>Enter your health data to receive personalized AI insights and predictions</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 33.33%;"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step active">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Vitals</span>
+                </div>
+                <div class="step">
+                    <i class="fas fa-moon"></i>
+                    <span>Lifestyle</span>
+                </div>
+                <div class="step">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Academic</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form method="post" id="healthForm">
+                {% csrf_token %}
+
+                <!-- Step 1: Vitals -->
+                <div class="form-step active" data-step="1">
+                    <h2>Vital Signs</h2>
+                    <p>Enter your current vital signs measurements</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ form.heart_rate.id_for_label }}">
+                                <i class="fas fa-heartbeat"></i> Heart Rate (bpm)
+                            </label>
+                            {{ form.heart_rate }}
+                            <div class="form-help">Normal range: 60-100 bpm</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.temperature.id_for_label }}">
+                                <i class="fas fa-thermometer-half"></i> Temperature (°F)
+                            </label>
+                            {{ form.temperature }}
+                            <div class="form-help">Normal range: 97.0-99.0°F</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.bp_systolic.id_for_label }}">
+                                <i class="fas fa-tint"></i> Systolic BP (mmHg)
+                            </label>
+                            {{ form.bp_systolic }}
+                            <div class="form-help">Normal: less than 120</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.bp_diastolic.id_for_label }}">
+                                <i class="fas fa-tint"></i> Diastolic BP (mmHg)
+                            </label>
+                            {{ form.bp_diastolic }}
+                            <div class="form-help">Normal: less than 80</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.spo2.id_for_label }}">
+                                <i class="fas fa-lungs"></i> SpO2 (%)
+                            </label>
+                            {{ form.spo2 }}
+                            <div class="form-help">Normal: 95-100%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Lifestyle -->
+                <div class="form-step" data-step="2">
+                    <h2>Lifestyle & Wellness</h2>
+                    <p>Track your daily lifestyle factors that impact your health</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ form.sleep_hours.id_for_label }}">
+                                <i class="fas fa-moon"></i> Sleep Hours
+                            </label>
+                            {{ form.sleep_hours }}
+                            <div class="form-help">Recommended: 7-9 hours</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.water_intake.id_for_label }}">
+                                <i class="fas fa-glass-water"></i> Water Intake (glasses)
+                            </label>
+                            {{ form.water_intake }}
+                            <div class="form-help">Recommended: 8+ glasses</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.sleep_quality.id_for_label }}">
+                                <i class="fas fa-bed"></i> Sleep Quality (1-10)
+                            </label>
+                            {{ form.sleep_quality }}
+                            <div class="form-help">1 = Poor, 10 = Excellent</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.physical_activity.id_for_label }}">
+                                <i class="fas fa-running"></i> Physical Activity (hours)
+                            </label>
+                            {{ form.physical_activity }}
+                            <div class="form-help">Daily exercise/activity time</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.stress_level.id_for_label }}">
+                                <i class="fas fa-brain"></i> Stress Level (1-10)
+                            </label>
+                            {{ form.stress_level }}
+                            <div class="form-help">1 = No stress, 10 = Very stressed</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.screen_time.id_for_label }}">
+                                <i class="fas fa-mobile-alt"></i> Screen Time (hours)
+                            </label>
+                            {{ form.screen_time }}
+                            <div class="form-help">Daily recreational screen time</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.mood_rating.id_for_label }}">
+                                <i class="fas fa-smile"></i> Mood Rating (1-10)
+                            </label>
+                            {{ form.mood_rating }}
+                            <div class="form-help">1 = Very low, 10 = Excellent</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.diet_quality.id_for_label }}">
+                                <i class="fas fa-apple-alt"></i> Diet Quality (1-10)
+                            </label>
+                            {{ form.diet_quality }}
+                            <div class="form-help">1 = Poor nutrition, 10 = Excellent</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Academic -->
+                <div class="form-step" data-step="3">
+                    <h2>Academic Performance</h2>
+                    <p>Track your academic activities and performance metrics</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ form.study_hours.id_for_label }}">
+                                <i class="fas fa-book"></i> Study Hours
+                            </label>
+                            {{ form.study_hours }}
+                            <div class="form-help">Daily study/homework time</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.attendance_percentage.id_for_label }}">
+                                <i class="fas fa-calendar-check"></i> Attendance (%)
+                            </label>
+                            {{ form.attendance_percentage }}
+                            <div class="form-help">Recent class attendance</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.focus_level.id_for_label }}">
+                                <i class="fas fa-crosshairs"></i> Focus Level (1-10)
+                            </label>
+                            {{ form.focus_level }}
+                            <div class="form-help">Study concentration ability</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.assignments_completed.id_for_label }}">
+                                <i class="fas fa-tasks"></i> Assignments Completed (%)
+                            </label>
+                            {{ form.assignments_completed }}
+                            <div class="form-help">Completion rate for recent assignments</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.academic_stress.id_for_label }}">
+                                <i class="fas fa-graduation-cap"></i> Academic Stress (1-10)
+                            </label>
+                            {{ form.academic_stress }}
+                            <div class="form-help">Study-related stress level</div>
+                        </div>
+                    </div>
+
+                    <div class="form-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Ready to Generate Insights</strong>
+                            <p>Once submitted, our AI will analyze your data and provide personalized health predictions and recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Form Navigation -->
+            <div class="form-navigation">
+                <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button type="button" class="btn btn-primary" id="nextBtn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                    <i class="fas fa-check"></i> Complete Entry
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/forms.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('healthForm');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function showStep(step) {
+        // Hide all steps
+        document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'completed'));
+
+        // Show current step
+        document.querySelector(`[data-step="${step}"]`).classList.add('active');
+
+        // Update step indicators
+        document.querySelectorAll('.step').forEach((s, index) => {
+            if (index + 1 === step) {
+                s.classList.add('active');
+            } else if (index + 1 < step) {
+                s.classList.add('completed');
+            }
+        });
+
+        // Update progress bar
+        const progress = (step / totalSteps) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+
+        // Update navigation
+        prevBtn.style.display = step === 1 ? 'none' : 'inline-flex';
+        if (step === totalSteps) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'inline-flex';
+        } else {
+            nextBtn.style.display = 'inline-flex';
+            submitBtn.style.display = 'none';
+        }
+    }
+
+    function validateCurrentStep() {
+        const currentStepEl = document.querySelector(`[data-step="${currentStep}"]`);
+        const requiredInputs = currentStepEl.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+
+        requiredInputs.forEach(input => {
+            if (!input.value.trim()) {
+                isValid = false;
+                input.classList.add('error');
+                input.focus();
+                return false;
+            } else {
+                input.classList.remove('error');
+            }
+        });
+
+        return isValid;
+    }
+
+    nextBtn.addEventListener('click', function() {
+        if (validateCurrentStep() && currentStep < totalSteps) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    });
+
+    prevBtn.addEventListener('click', function() {
+        if (currentStep > 1) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+
+    submitBtn.addEventListener('click', function() {
+        if (validateCurrentStep()) {
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+
+            // Submit form
+            form.submit();
+        }
+    });
+
+    // Clear error styling on input
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+    });
+
+    // Initialize
+    showStep(currentStep);
+});
+</script>
+{% endblock %}

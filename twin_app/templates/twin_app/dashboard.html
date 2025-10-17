@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Dashboard - Digital Twin{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1>Health Dashboard</h1>
+        <p>Your personalized health insights and predictions</p>
+    </div>
+
+    <!-- Health Score Section -->
+    <div class="health-score-section">
+        <div class="health-score-card">
+            <div class="score-circle">
+                <canvas id="healthScoreChart" width="200" height="200"></canvas>
+                <div class="score-text">
+                    <span class="score-number" id="healthScore">{{ health_score|default:"0" }}</span>
+                    <span class="score-label">Health Score</span>
+                </div>
+            </div>
+            <div class="score-details">
+                <div class="risk-level {% if latest_prediction.risk_level == 'LOW' %}low{% elif latest_prediction.risk_level == 'MEDIUM' %}medium{% else %}high{% endif %}">
+                    <i class="fas fa-{% if latest_prediction.risk_level == 'LOW' %}check-circle{% elif latest_prediction.risk_level == 'MEDIUM' %}exclamation-triangle{% else %}times-circle{% endif %}"></i>
+                    <span>{{ latest_prediction.risk_level|default:"Low" }} Risk</span>
+                </div>
+                <div class="last-updated">
+                    Last updated: <span id="lastUpdated">
+                        {% if latest_vitals %}{{ latest_vitals.recorded_at|date:"M d, Y" }}{% else %}Never{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+        <div class="stat-card">
+            <div class="stat-icon vitals">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="stat-content">
+                <h3 id="avgHeartRate">{{ vitals_avg.avg_hr|floatformat:0|default:"--" }}</h3>
+                <p>Avg Heart Rate</p>
+                <span class="stat-trend positive">Recent</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon sleep">
+                <i class="fas fa-moon"></i>
+            </div>
+            <div class="stat-content">
+                <h3 id="avgSleep">{{ lifestyle_avg.avg_sleep|floatformat:1|default:"--" }}</h3>
+                <p>Avg Sleep Hours</p>
+                <span class="stat-trend {% if lifestyle_avg.avg_sleep >= 7 %}positive{% else %}negative{% endif %}">
+                    {% if lifestyle_avg.avg_sleep >= 7 %}Good{% else %}Low{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stress">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div class="stat-content">
+                <h3 id="avgStress">{{ lifestyle_avg.avg_stress|floatformat:1|default:"--" }}</h3>
+                <p>Avg Stress Level</p>
+                <span class="stat-trend {% if lifestyle_avg.avg_stress <= 5 %}positive{% else %}negative{% endif %}">
+                    {% if lifestyle_avg.avg_stress <= 5 %}Manageable{% else %}High{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon academic">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="stat-content">
+                <h3 id="avgStudyHours">{{ academic_avg.avg_study|floatformat:1|default:"--" }}</h3>
+                <p>Avg Study Hours</p>
+                <span class="stat-trend positive">Daily</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-heartbeat"></i> Vital Signs Trends</h3>
+                <div class="chart-controls">
+                    <select id="vitalsTimeRange" onchange="updateVitalsChart()">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="vitalsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-moon"></i> Lifestyle Patterns</h3>
+                <div class="chart-controls">
+                    <select id="lifestyleTimeRange" onchange="updateLifestyleChart()">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="lifestyleChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Recommendations Section -->
+    {% if latest_prediction %}
+    <div class="recommendations-section">
+        <h3><i class="fas fa-lightbulb"></i> AI Recommendations</h3>
+        <div class="recommendations-grid">
+            <div class="recommendation-card {% if latest_prediction.risk_level == 'LOW' %}success{% elif latest_prediction.risk_level == 'MEDIUM' %}warning{% else %}danger{% endif %}">
+                <div class="recommendation-icon">🤖</div>
+                <div class="recommendation-content">
+                    <h4>AI Health Assessment</h4>
+                    <p>{{ latest_prediction.explanation|truncatewords:25 }}</p>
+                    <span class="recommendation-priority">{{ latest_prediction.risk_level|title }} Priority</span>
+                </div>
+            </div>
+            {% if latest_prediction.recommendations %}
+                {% for recommendation in latest_prediction.recommendations|slice:":3" %}
+                <div class="recommendation-card info">
+                    <div class="recommendation-icon">💡</div>
+                    <div class="recommendation-content">
+                        <h4>Personalized Tip</h4>
+                        <p>{{ recommendation|truncatewords:20 }}</p>
+                        <span class="recommendation-priority">AI Generated</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Health Goals Section -->
+    <div class="goals-section">
+        <div class="section-header">
+            <h3><i class="fas fa-target"></i> Health Goals</h3>
+            <a href="{% url 'health_goals' %}" class="btn btn-outline">Manage Goals</a>
+        </div>
+        <div class="goals-grid" id="goalsGrid">
+            {% for goal in active_goals %}
+            <div class="goal-card">
+                <div class="goal-header">
+                    <h4>{{ goal.title }}</h4>
+                    <span class="goal-progress">{{ goal.progress_percentage }}%</span>
+                </div>
+                <div class="goal-progress-bar">
+                    <div class="progress-fill" style="width: {{ goal.progress_percentage }}%"></div>
+                </div>
+                <div class="goal-details">
+                    <span class="goal-target">Target: {{ goal.target_value }} {{ goal.unit }}</span>
+                    <span class="goal-current">Due: {{ goal.target_date|date:"M d, Y" }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="goal-card" style="grid-column: 1 / -1; text-align: center; opacity: 0.7;">
+                <p>No active goals. <a href="{% url 'health_goals' %}">Create your first health goal</a>!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
+<script src="/static/js/charts.js"></script>
+<script>
+// Initialize dashboard with Django data
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart data from Django
+    const vitalsData = {{ vitals_chart_data|safe }};
+    const lifestyleData = {{ lifestyle_chart_data|safe }};
+
+    // Initialize health score chart
+    const healthScoreCtx = document.getElementById('healthScoreChart');
+    if (healthScoreCtx) {
+        const score = {{ health_score|default:0 }};
+        new Chart(healthScoreCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [score, 100 - score],
+                    backgroundColor: [
+                        score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444',
+                        'rgba(0, 0, 0, 0.05)'
+                    ],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+    }
+
+    // Initialize vitals chart
+    const vitalsCtx = document.getElementById('vitalsChart');
+    if (vitalsCtx && vitalsData.labels && vitalsData.labels.length > 0) {
+        new Chart(vitalsCtx, {
+            type: 'line',
+            data: {
+                labels: vitalsData.labels,
+                datasets: [
+                    {
+                        label: 'Heart Rate',
+                        data: vitalsData.heart_rate,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    },
+                    {
+                        label: 'Systolic BP',
+                        data: vitalsData.bp_systolic,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    },
+                    {
+                        label: 'SpO2',
+                        data: vitalsData.spo2,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize lifestyle chart
+    const lifestyleCtx = document.getElementById('lifestyleChart');
+    if (lifestyleCtx && lifestyleData.labels && lifestyleData.labels.length > 0) {
+        new Chart(lifestyleCtx, {
+            type: 'line',
+            data: {
+                labels: lifestyleData.labels,
+                datasets: [
+                    {
+                        label: 'Sleep Hours',
+                        data: lifestyleData.sleep_hours,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Stress Level',
+                        data: lifestyleData.stress_level,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        label: 'Physical Activity',
+                        data: lifestyleData.physical_activity,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Hours'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Level (1-10)'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+    }
+});
+
+// Functions for chart updates
+function updateVitalsChart() {
+    const days = document.getElementById('vitalsTimeRange').value;
+    // Fetch new data via AJAX and update chart
+    fetch(`/api/chart-data/?type=vitals&days=${days}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update chart with new data
+            console.log('Updated vitals chart for', days, 'days');
+        });
+}
+
+function updateLifestyleChart() {
+    const days = document.getElementById('lifestyleTimeRange').value;
+    // Fetch new data via AJAX and update chart
+    fetch(`/api/chart-data/?type=lifestyle&days=${days}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update chart with new data
+            console.log('Updated lifestyle chart for', days, 'days');
+        });
+}
+</script>
+{% endblock %}
