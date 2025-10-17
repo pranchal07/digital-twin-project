@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: digital-twin-backend
+    env: python
+    region: oregon   # change if you prefer another region
+    plan: free       # change if using paid plan
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn digital_twin_django_backend.wsgi:application
+    pythonVersion: "3.12"
+    envVars:
+      DJANGO_SETTINGS_MODULE: "digital_twin_django_backend.settings"
+      SECRET_KEY: "replace_with_your_secret_key"
+      DEBUG: "False"
+      ALLOWED_HOSTS: "['*']"   # replace with your domain in production
