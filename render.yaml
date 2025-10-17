@@ -2,8 +2,8 @@ services:
   - type: web
     name: digital-twin-backend
     env: python
-    region: oregon          # change if you prefer another region
-    plan: free              # change if using paid plan
+    region: oregon
+    plan: free
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
